@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const customerSchema = new mongoose.Schema({
   customerId: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    sparse: true  // Allows null values while maintaining uniqueness
   },
   firstName: {
     type: String,

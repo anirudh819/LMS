@@ -12,7 +12,9 @@ import {
   Menu,
   X,
   TrendingUp,
-  Bell
+  Bell,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const navItems = [
@@ -33,14 +35,14 @@ const Layout = ({ children }) => {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col w-72 glass transition-transform duration-300 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-20'
+        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col glass transition-all duration-300 ${
+          sidebarOpen ? 'w-72 translate-x-0' : 'w-20 -translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-20 px-6 border-b border-white/5">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+        <div className={`flex items-center h-20 border-b border-white/5 ${sidebarOpen ? 'justify-between px-6' : 'justify-center px-2'}`}>
+          <Link to="/" className={`flex items-center ${sidebarOpen ? 'gap-3' : ''}`}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             {sidebarOpen && (
@@ -57,6 +59,21 @@ const Layout = ({ children }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
+        
+        {/* Collapse/Expand Button (Desktop Only) */}
+        <div className={`hidden lg:flex border-b border-white/5 ${sidebarOpen ? 'justify-end px-4 py-2' : 'justify-center py-2'}`}>
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-lg hover:bg-white/5 transition-colors text-dark-400 hover:text-white"
+            title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {sidebarOpen ? (
+              <ChevronLeft className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
+        </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -65,27 +82,37 @@ const Layout = ({ children }) => {
             const isActive = location.pathname === item.path;
             
             return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive
-                    ? 'bg-gradient-to-r from-primary-500/20 to-accent-500/20 text-white border border-primary-500/30'
-                    : 'text-dark-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary-400' : 'group-hover:text-primary-400'}`} />
-                {sidebarOpen && (
-                  <span className="font-medium">{item.label}</span>
+              <div key={item.path} className="relative group/nav">
+                <Link
+                  to={item.path}
+                  className={`flex items-center rounded-xl transition-all duration-200 ${
+                    sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center py-3'
+                  } ${
+                    isActive
+                      ? 'bg-gradient-to-r from-primary-500/20 to-accent-500/20 text-white border border-primary-500/30'
+                      : 'text-dark-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary-400' : 'group-hover/nav:text-primary-400'}`} />
+                  {sidebarOpen && (
+                    <span className="font-medium">{item.label}</span>
+                  )}
+                </Link>
+                {/* Tooltip for collapsed state */}
+                {!sidebarOpen && (
+                  <div className="absolute left-full ml-2 px-3 py-2 bg-dark-800 text-white text-sm rounded-lg opacity-0 invisible group-hover/nav:opacity-100 group-hover/nav:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+                    {item.label}
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-dark-800"></div>
+                  </div>
                 )}
-              </Link>
+              </div>
             );
           })}
         </nav>
 
         {/* Bottom section */}
-        {sidebarOpen && (
-          <div className="p-4 border-t border-white/5">
+        <div className={`border-t border-white/5 ${sidebarOpen ? 'p-4' : 'p-2'}`}>
+          {sidebarOpen ? (
             <div className="p-4 rounded-xl glass-light">
               <p className="text-xs text-dark-400 mb-2">API Status</p>
               <div className="flex items-center gap-2">
@@ -93,8 +120,19 @@ const Layout = ({ children }) => {
                 <span className="text-sm text-green-400">Connected</span>
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex justify-center">
+              <div className="relative group/status">
+                <span className="w-3 h-3 rounded-full bg-green-500 status-active block"></span>
+                {/* Tooltip */}
+                <div className="absolute left-full ml-2 px-3 py-2 bg-dark-800 text-white text-sm rounded-lg opacity-0 invisible group-hover/status:opacity-100 group-hover/status:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none bottom-0">
+                  API Connected
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-dark-800"></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </aside>
 
       {/* Main content */}

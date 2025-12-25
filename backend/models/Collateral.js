@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const collateralSchema = new mongoose.Schema({
   collateralId: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    sparse: true  // Allows null values while maintaining uniqueness
   },
   customerId: {
     type: mongoose.Schema.Types.ObjectId,

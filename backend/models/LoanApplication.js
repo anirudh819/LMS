@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const loanApplicationSchema = new mongoose.Schema({
   applicationId: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    sparse: true  // Allows null values while maintaining uniqueness
   },
   customerId: {
     type: mongoose.Schema.Types.ObjectId,

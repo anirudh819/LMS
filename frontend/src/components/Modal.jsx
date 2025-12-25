@@ -29,9 +29,10 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
         onClick={onClose}
       />
       <div
-        className={`relative w-full ${sizes[size]} glass rounded-2xl animate-slide-up`}
+        className={`relative w-full ${sizes[size]} max-h-[90vh] flex flex-col glass rounded-2xl animate-slide-up`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        {/* Fixed Header */}
+        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-white/10 bg-inherit rounded-t-2xl">
           <h2 className="text-xl font-display font-semibold text-white">{title}</h2>
           <button
             onClick={onClose}
@@ -40,7 +41,8 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
             <X className="w-5 h-5 text-dark-400" />
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
     </div>
   );
