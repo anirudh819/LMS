@@ -10,6 +10,7 @@ import OngoingLoans from './pages/OngoingLoans';
 import LoanDetails from './pages/LoanDetails';
 import CollateralManagement from './pages/CollateralManagement';
 import Customers from './pages/Customers';
+import PartnerManagement from './pages/PartnerManagement';
 import Notifications from './components/Notifications';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
               <Route path="/loans/:id" element={<LoanDetails />} />
               <Route path="/collaterals" element={<CollateralManagement />} />
               <Route path="/customers" element={<Customers />} />
+              <Route path="/partners" element={<PartnerManagement />} />
             </Routes>
           </Layout>
           <Notifications />

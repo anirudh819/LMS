@@ -14,7 +14,8 @@ import {
   TrendingUp,
   Bell,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react';
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { path: '/ongoing-loans', label: 'Ongoing Loans', icon: Wallet },
   { path: '/collaterals', label: 'Collaterals', icon: Shield },
   { path: '/customers', label: 'Customers', icon: Users },
+  { path: '/partners', label: 'API Partners', icon: Building2 },
 ];
 
 const Layout = ({ children }) => {

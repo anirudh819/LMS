@@ -688,6 +688,134 @@ POST /api/collaterals/bulk-nav-update
 
 ---
 
+### Partners API (Admin Only)
+
+#### Get All Partners
+```http
+GET /api/partners
+```
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| status | string | Filter by status (ACTIVE, INACTIVE, SUSPENDED, PENDING_APPROVAL) |
+| businessType | string | Filter by business type |
+| search | string | Search by name or company |
+| page | number | Page number |
+| limit | number | Items per page |
+
+#### Create New Partner
+```http
+POST /api/partners
+```
+
+**Request Body:**
+```json
+{
+  "partnerName": "QuickFinance",
+  "companyName": "QuickFinance Technologies Pvt Ltd",
+  "contactPerson": {
+    "name": "Rajesh Kumar",
+    "email": "rajesh@quickfinance.com",
+    "phone": "9876543210",
+    "designation": "CTO"
+  },
+  "businessType": "FINTECH",
+  "gstNumber": "29ABCDE1234F1Z5",
+  "panNumber": "ABCDE1234F",
+  "webhookUrl": "https://quickfinance.com/webhooks/lms"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Partner created successfully",
+  "data": {
+    "partner": {
+      "partnerId": "PARTNER0001",
+      "partnerName": "QuickFinance",
+      "status": "PENDING_APPROVAL"
+    },
+    "credentials": {
+      "apiKey": "PARTNER0001_abc123def456...",
+      "apiSecret": "xyz789uvw456...",
+      "note": "Please save the API Secret securely. It will not be shown again."
+    }
+  }
+}
+```
+
+#### Update Partner Status
+```http
+PATCH /api/partners/:id/status
+```
+
+**Request Body:**
+```json
+{
+  "status": "ACTIVE",
+  "reason": "Partner verification completed"
+}
+```
+
+#### Regenerate API Credentials
+```http
+POST /api/partners/:id/regenerate-credentials
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API credentials regenerated successfully",
+  "data": {
+    "apiKey": "PARTNER0001_new123...",
+    "apiSecret": "new456...",
+    "warning": "Old credentials are now invalid. Please update your integration immediately."
+  }
+}
+```
+
+#### Get Partner Statistics
+```http
+GET /api/partners/:id/statistics
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "partner": {
+      "partnerId": "PARTNER0001",
+      "partnerName": "QuickFinance",
+      "status": "ACTIVE"
+    },
+    "statistics": {
+      "totalApplications": 150,
+      "approvedApplications": 120,
+      "totalDisbursed": 15000000,
+      "apiCallsToday": 450,
+      "apiCallsThisMonth": 12500
+    },
+    "applicationBreakdown": [
+      { "_id": "APPROVED", "count": 120, "totalAmount": 15000000 },
+      { "_id": "REJECTED", "count": 20, "totalAmount": 0 },
+      { "_id": "PENDING", "count": 10, "totalAmount": 0 }
+    ]
+  }
+}
+```
+
+#### Get Partner Dashboard
+```http
+GET /api/partners/dashboard
+```
+
+---
+
 ## Error Responses
 
 All API errors follow this format:
@@ -710,6 +838,9 @@ Common Error Codes:
 | DUPLICATE_ERROR | 400 | Duplicate entry |
 | INVALID_API_KEY | 403 | Invalid API key |
 | MISSING_API_KEY | 401 | API key not provided |
+| PARTNER_INACTIVE | 403 | Partner account is not active |
+| RATE_LIMIT_EXCEEDED | 429 | API rate limit exceeded |
+| IP_NOT_WHITELISTED | 403 | IP address not authorized |
 | INTERNAL_ERROR | 500 | Server error |
 
 ---
@@ -735,11 +866,14 @@ Track pledged mutual fund units, update NAVs, and monitor portfolio health.
 
 ## 🔒 Security Considerations
 
-1. **API Key Authentication**: All fintech partner APIs require valid API keys
-2. **Input Validation**: All inputs are validated using express-validator
-3. **Helmet.js**: Security headers configured
-4. **CORS**: Configured for allowed origins
-5. **Rate Limiting**: Consider implementing for production
+1. **API Key Authentication**: Each partner has unique API keys stored securely
+2. **Partner Management**: Admin can approve, suspend, or revoke partner access
+3. **Rate Limiting**: Per-partner rate limits (requests per minute/day)
+4. **IP Whitelisting**: Optional IP-based access control
+5. **Input Validation**: All inputs are validated using express-validator
+6. **Helmet.js**: Security headers configured
+7. **CORS**: Configured for allowed origins
+8. **Audit Trail**: All partner actions and credential changes are logged
 
 ---
 

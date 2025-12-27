@@ -80,7 +80,13 @@ const LoanApplications = () => {
     try {
       setProcessing(true);
       
-      if (actionType === 'approve') {
+      if (actionType === 'review') {
+        await loanApplicationsAPI.updateStatus(selectedApp._id, {
+          status: 'UNDER_REVIEW',
+          remarks: actionRemarks || 'Application moved to review'
+        });
+        showSuccess('Application moved to review');
+      } else if (actionType === 'approve') {
         await loanApplicationsAPI.updateStatus(selectedApp._id, {
           status: 'APPROVED',
           remarks: actionRemarks,
@@ -224,6 +230,15 @@ const LoanApplications = () => {
                           icon={Eye}
                           onClick={() => handleViewDetails(app)}
                         />
+                        {app.status === 'SUBMITTED' && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleAction('review', app)}
+                          >
+                            Review
+                          </Button>
+                        )}
                         {app.status === 'UNDER_REVIEW' && (
                           <>
                             <Button
@@ -400,6 +415,7 @@ const LoanApplications = () => {
         isOpen={isActionModalOpen}
         onClose={() => setIsActionModalOpen(false)}
         title={
+          actionType === 'review' ? 'Move to Review' :
           actionType === 'approve' ? 'Approve Application' :
           actionType === 'reject' ? 'Reject Application' :
           'Disburse Loan'
@@ -414,6 +430,10 @@ const LoanApplications = () => {
                 {formatCurrency(selectedApp?.approvedAmount || selectedApp?.requestedAmount)}
               </span>{' '}
               for this application?
+            </p>
+          ) : actionType === 'review' ? (
+            <p className="text-dark-300">
+              Move this application to <span className="text-white font-bold">Under Review</span> status to begin the approval process?
             </p>
           ) : (
             <>
@@ -440,7 +460,8 @@ const LoanApplications = () => {
               onClick={submitAction}
               loading={processing}
             >
-              {actionType === 'approve' ? 'Approve' :
+              {actionType === 'review' ? 'Move to Review' :
+               actionType === 'approve' ? 'Approve' :
                actionType === 'reject' ? 'Reject' : 'Disburse'}
             </Button>
           </div>

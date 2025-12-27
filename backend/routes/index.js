@@ -6,6 +6,7 @@ const customerRoutes = require('./customerRoutes');
 const collateralRoutes = require('./collateralRoutes');
 const loanApplicationRoutes = require('./loanApplicationRoutes');
 const loanRoutes = require('./loanRoutes');
+const partnerRoutes = require('./partnerRoutes');
 
 // Mount routes
 router.use('/loan-products', loanProductRoutes);
@@ -13,6 +14,7 @@ router.use('/customers', customerRoutes);
 router.use('/collaterals', collateralRoutes);
 router.use('/loan-applications', loanApplicationRoutes);
 router.use('/loans', loanRoutes);
+router.use('/partners', partnerRoutes);
 
 // API Health check
 router.get('/health', (req, res) => {

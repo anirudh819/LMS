@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { LoanProduct, Customer, Collateral, LoanApplication, Loan } = require('../models');
+const { LoanProduct, Customer, Collateral, LoanApplication, Loan, Partner } = require('../models');
 
 const connectDB = async () => {
   try {
@@ -407,6 +407,134 @@ const seedDatabase = async () => {
     
     console.log(`Created pending application: ${pendingApplication.applicationId}`);
 
+    // Seed Partners
+    console.log('\nSeeding partners...');
+    await Partner.deleteMany({});
+    
+    const partners = [
+      {
+        partnerName: 'QuickFinance',
+        companyName: 'QuickFinance Technologies Pvt Ltd',
+        contactPerson: {
+          name: 'Rajesh Kumar',
+          email: 'rajesh@quickfinance.com',
+          phone: '9876543210',
+          designation: 'CTO'
+        },
+        address: {
+          street: '123 Tech Park',
+          city: 'Bangalore',
+          state: 'Karnataka',
+          pincode: '560001',
+          country: 'India'
+        },
+        businessType: 'FINTECH',
+        gstNumber: '29ABCDE1234F1Z5',
+        panNumber: 'ABCDE1234F',
+        status: 'ACTIVE',
+        permissions: {
+          canCreateApplications: true,
+          canViewApplications: true,
+          canUpdateApplications: false,
+          canViewCustomers: true,
+          canCreateCustomers: true
+        },
+        rateLimit: {
+          requestsPerMinute: 100,
+          requestsPerDay: 50000
+        },
+        commission: {
+          type: 'PERCENTAGE',
+          value: 1.5,
+          currency: 'INR'
+        },
+        contractStartDate: new Date('2024-01-01'),
+        contractEndDate: new Date('2025-12-31'),
+        webhookUrl: 'https://quickfinance.com/webhooks/lms',
+        webhookEvents: ['APPLICATION_APPROVED', 'LOAN_DISBURSED'],
+        notes: 'Premium fintech partner'
+      },
+      {
+        partnerName: 'LoanAggregator',
+        companyName: 'Loan Aggregator Services Ltd',
+        contactPerson: {
+          name: 'Priya Sharma',
+          email: 'priya@loanaggregator.com',
+          phone: '9876543211',
+          designation: 'Head of Partnerships'
+        },
+        address: {
+          street: '456 Business Center',
+          city: 'Mumbai',
+          state: 'Maharashtra',
+          pincode: '400001',
+          country: 'India'
+        },
+        businessType: 'AGGREGATOR',
+        gstNumber: '27FGHIJ5678K1L9',
+        panNumber: 'FGHIJ5678K',
+        status: 'ACTIVE',
+        permissions: {
+          canCreateApplications: true,
+          canViewApplications: true,
+          canUpdateApplications: false,
+          canViewCustomers: true,
+          canCreateCustomers: true
+        },
+        rateLimit: {
+          requestsPerMinute: 60,
+          requestsPerDay: 20000
+        },
+        commission: {
+          type: 'PERCENTAGE',
+          value: 2.0,
+          currency: 'INR'
+        },
+        contractStartDate: new Date('2024-03-01'),
+        contractEndDate: new Date('2025-12-31')
+      },
+      {
+        partnerName: 'TestPartner',
+        companyName: 'Test Partner Inc',
+        contactPerson: {
+          name: 'Test User',
+          email: 'test@testpartner.com',
+          phone: '9999999999',
+          designation: 'Developer'
+        },
+        address: {
+          street: 'Test Street',
+          city: 'Delhi',
+          state: 'Delhi',
+          pincode: '110001',
+          country: 'India'
+        },
+        businessType: 'FINTECH',
+        status: 'PENDING_APPROVAL',
+        permissions: {
+          canCreateApplications: true,
+          canViewApplications: true,
+          canUpdateApplications: false,
+          canViewCustomers: true,
+          canCreateCustomers: true
+        }
+      }
+    ];
+
+    const createdPartners = [];
+    for (const partnerData of partners) {
+      const partner = new Partner(partnerData);
+      const credentials = partner.generateApiCredentials();
+      await partner.save();
+      createdPartners.push({
+        partner,
+        credentials
+      });
+      console.log(`Created partner: ${partner.partnerName} (${partner.partnerId})`);
+      console.log(`  API Key: ${credentials.apiKey}`);
+      console.log(`  API Secret: ${credentials.apiSecret}`);
+    }
+
     console.log('\n✅ Database seeded successfully!');
     console.log('\nSummary:');
     console.log(`- Loan Products: ${createdProducts.length}`);
@@ -414,6 +542,7 @@ const seedDatabase = async () => {
     console.log(`- Collaterals: ${createdCollaterals.length + 1}`);
     console.log(`- Loan Applications: 2`);
     console.log(`- Active Loans: 1`);
+    console.log(`- Partners: ${createdPartners.length}`);
 
     process.exit(0);
   } catch (error) {
